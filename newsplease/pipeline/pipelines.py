@@ -503,6 +503,8 @@ class ElasticsearchStorage(ExtractedInformationStorage):
             except ConnectionError as error:
                 self.running = False
                 self.log.error("Lost connection to Elasticsearch, this module will be deactivated: %s" % error)
+            except Exception as err:
+                self.log.error("other error: %s" % (err))
         return item
 
 
