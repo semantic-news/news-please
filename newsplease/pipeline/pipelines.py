@@ -459,10 +459,10 @@ class ElasticsearchStorage(ExtractedInformationStorage):
             # check if the necessary indices exist and create them if needed
             if not self.es.indices.exists(self.index_current):
                 self.es.indices.create(index=self.index_current, ignore=[400, 404])
-                self.es.indices.put_mapping(index=self.index_current, doc_type='_doc', body=self.mapping)
+                self.es.indices.put_mapping(index=self.index_current, doc_type='news-please', body=self.mapping)
             if not self.es.indices.exists(self.index_archive):
                 self.es.indices.create(index=self.index_archive, ignore=[400, 404])
-                self.es.indices.put_mapping(index=self.index_archive, doc_type='_doc', body=self.mapping)
+                self.es.indices.put_mapping(index=self.index_archive, doc_type='news-please', body=self.mapping)
             self.running = True
 
             # restore previous logging level
@@ -486,7 +486,7 @@ class ElasticsearchStorage(ExtractedInformationStorage):
                     # save old version into index_archive
                     old_version = request['hits']['hits'][0]
                     old_version['_source']['descendent'] = True
-                    self.es.index(index=self.index_archive, doc_type='_doc', body=old_version['_source'])
+                    self.es.index(index=self.index_archive, doc_type='news-please', body=old_version['_source'])
                     version += 1
                     ancestor = old_version['_id']
 
@@ -496,7 +496,7 @@ class ElasticsearchStorage(ExtractedInformationStorage):
                 extracted_info['ancestor'] = ancestor
                 extracted_info['version'] = version
                 extracted_info['@timestamp'] = extracted_info['date_publish']
-                self.es.index(index=self.index_current, doc_type='_doc', id=ancestor,
+                self.es.index(index="%s_%s" % (self.index_current, extracted_info['date_publish'][:10]), doc_type='news-please', id=ancestor,
                               body=extracted_info)
 
 
