@@ -495,6 +495,7 @@ class ElasticsearchStorage(ExtractedInformationStorage):
                 extracted_info = ExtractedInformationStorage.extract_relevant_info(item)
                 extracted_info['ancestor'] = ancestor
                 extracted_info['version'] = version
+                extracted_info['@timestamp'] = extracted_info['date_publish']
                 self.es.index(index=self.index_current, doc_type='_doc', id=ancestor,
                               body=extracted_info)
 
