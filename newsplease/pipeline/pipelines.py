@@ -497,6 +497,8 @@ class ElasticsearchStorage(ExtractedInformationStorage):
                 extracted_info['version'] = version
                 extracted_info['@timestamp'] = extracted_info['date_publish']
                 self.es.indices.create(index="%s_%s" % (self.index_current, extracted_info['date_publish'][:10]), ignore=[400, 404], body={"settings" : {"index" : {"number_of_shards":1}}})
+                self.es.indices.put_mapping(index="%s_%s" % (self.index_current, extracted_info['date_publish'][:10]), doc_type='news-please', body=self.mapping)
+
                 self.es.index(index="%s_%s" % (self.index_current, extracted_info['date_publish'][:10]), doc_type='news-please', id=ancestor,
                               body=extracted_info)
 
