@@ -458,13 +458,11 @@ class ElasticsearchStorage(ExtractedInformationStorage):
 
             # check if the necessary indices exist and create them if needed
             if not self.es.indices.exists(self.index_current):
-                self.es.indices.create(index=self.index_current, ignore=[400, 404])
+                self.es.indices.create(index=self.index_current, ignore=[400, 404], body={"settings" : {"index" : {"number_of_shards":1}}})
                 self.es.indices.put_mapping(index=self.index_current, doc_type='news-please', body=self.mapping)
-                self.es.indices.put_settings(index="_all", body={"number_of_shards": "1"})
             if not self.es.indices.exists(self.index_archive):
-                self.es.indices.create(index=self.index_archive, ignore=[400, 404])
+                self.es.indices.create(index=self.index_archive, ignore=[400, 404], body={"settings" : {"index" : {"number_of_shards":1}}})
                 self.es.indices.put_mapping(index=self.index_archive, doc_type='news-please', body=self.mapping)
-                self.es.indices.put_settings(index="_all", body={"number_of_shards": "1"})
             self.running = True
 
             # restore previous logging level
@@ -498,6 +496,7 @@ class ElasticsearchStorage(ExtractedInformationStorage):
                 extracted_info['ancestor'] = ancestor
                 extracted_info['version'] = version
                 extracted_info['@timestamp'] = extracted_info['date_publish']
+                self.es.indices.create(index="%s_%s" % (self.index_current, extracted_info['date_publish'][:10]), ignore=[400, 404], body={"settings" : {"index" : {"number_of_shards":1}}})
                 self.es.index(index="%s_%s" % (self.index_current, extracted_info['date_publish'][:10]), doc_type='news-please', id=ancestor,
                               body=extracted_info)
 
