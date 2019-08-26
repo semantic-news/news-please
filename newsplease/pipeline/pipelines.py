@@ -481,14 +481,16 @@ class ElasticsearchStorage(ExtractedInformationStorage):
                 ancestor = None
 
                 # search for previous version
-                request = self.es.search(index=self.index_current, body={'query': {'match': {'url.keyword': item['url']}}})
+                # request = self.es.search(index=self.index_current, body={'query': {'match': {'url.keyword': item['url']}}})
+                request = self.es.search(index=self.index_current, body={'query': {'match': {'title': item['article_title']}}})
                 if request['hits']['total'] > 0:
                     # save old version into index_archive
-                    old_version = request['hits']['hits'][0]
-                    old_version['_source']['descendent'] = True
-                    self.es.index(index=self.index_archive, doc_type='news-please', body=old_version['_source'])
-                    version += 1
-                    ancestor = old_version['_id']
+                    # old_version = request['hits']['hits'][0]
+                    # old_version['_source']['descendent'] = True
+                    # self.es.index(index=self.index_archive, doc_type='news-please', body=old_version['_source'])
+                    # version += 1
+                    # ancestor = old_version['_id']
+                    return item
 
                 # save new version into old id of index_current
                 self.log.info("Saving to Elasticsearch: %s" % item['url'])
